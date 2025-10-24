@@ -1,7 +1,9 @@
 // メモ修正画面
 import { StyleSheet, Text, View, Button } from 'react-native';
 import { useRouter, useLocalSearchParams,useNavigation } from 'expo-router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { MemoInputForm } from '../../src/components/MemoInputForm';
+import { KeyboardAvoidingView } from '@gluestack-ui/themed';
 
 export default function MemoEditScreen() {
   const router = useRouter();
@@ -13,6 +15,9 @@ export default function MemoEditScreen() {
   // const { userId } = route.params as { userId: number };
 
   const { id } = useLocalSearchParams();
+
+  const [title, setTitle] = useState<string>("")      // タイトル
+  const [content, setContent] = useState<string>("")  // コンテンツ
 
   // 作成ボタンを押下したらデータを保存して、画面自体は閉じる。
   // この画面はModalで開くので、dismiss()で閉じることが可能
@@ -31,21 +36,26 @@ export default function MemoEditScreen() {
   }, [])
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>メモ修正: {id}</Text>
-    </View>
+    // KeyboardAvoidingViewはスマホでキーボードを出す際に下部の方に入力した値がキーボードで隠れないように
+    // キーボード表示時に画面下部の内容をキーボードより上に押し上げてくれる機能
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior='padding'
+      keyboardVerticalOffset={100}
+    >
+      <MemoInputForm
+        title={title}
+        content={content}
+        onContentChange={setContent}
+        onTitleChange={setTitle}
+      />
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#EFEFF4',
-    alignItems: 'center',
-    justifyContent: 'center'
+    backgroundColor: '#FFF',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold'
-  }
 });

@@ -2,7 +2,7 @@ import { StyleSheet, View, ScrollView, Text } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons'
 import { useRouter, useNavigation } from 'expo-router';
 import { useEffect } from 'react';
-import { LabelListItem } from '../../src/components/labelListItem';
+import { LabelListItem } from '../../src/components/LabelListItem';
 import { ListItem } from '@rneui/themed';
 
 // ダミーデータ

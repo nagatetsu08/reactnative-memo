@@ -5,7 +5,7 @@
   "editor.formatOnSave": false,
   // ファイルを保存する際に、自動的にimport文をフォーマットする
   "editor.codeActionsOnSave": {
-    "source.organizeImports": false,
+    "source.organizeImports": "never"
   },
   // ファイルを保存する際に、自動的にフォーマットを適用させるファイルを限定する
   "[javascript]": {
