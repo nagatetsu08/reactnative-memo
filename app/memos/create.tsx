@@ -51,6 +51,6 @@ export default function MemoCreateScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#EFEFF4',
+    backgroundColor: '#FFF',
   }
 });
