@@ -18,5 +18,8 @@ trim_trailing_whitespace = true
 [*.md] # Markdownファイルはトリミングしない
 trim_trailing_whitespace = false
 
+[*.{js,ts,tsx,json}]
+trim_trailing_whitespace = false
+
 # 最終行の改行 （true: 改行を入れる / false: 改行を入れない）
 insert_final_newline = true
