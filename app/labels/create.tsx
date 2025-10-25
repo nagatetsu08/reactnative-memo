@@ -36,7 +36,7 @@ export default function LabelCreateScreen() {
         </Input>
 
         {/* カラーピッカー */}
-        <ColorPicker onPress={() => handleColorPress(color)} />
+        <ColorPicker onPress={handleColorPress} />
 
         {/* actionはボタンの色 */}
         <Button size="md" action="primary" marginHorizontal={"$4"} onPress={handleCreatePress}>

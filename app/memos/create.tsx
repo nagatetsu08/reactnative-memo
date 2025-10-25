@@ -5,6 +5,9 @@ import { useEffect,useState } from 'react';
 import { MemoInputForm } from '../../src/components/MemoInputForm';
 import { KeyboardAvoidingView } from '@gluestack-ui/themed';
 
+// Recoil
+import { useRecoilValue } from 'recoil'; // Recoilへの値設定はやらずに、設定されている値を使うだけ
+import { selectedLabelIdState } from '../../src/recoils/selectedLabelId';
 
 export default function MemoCreateScreen() {
   const router = useRouter();
@@ -12,10 +15,15 @@ export default function MemoCreateScreen() {
   const [title, setTitle] = useState<string>("")      // タイトル
   const [content, setContent] = useState<string>("")  // コンテンツ
 
-  // memo画面はモーダルで開かず、Stackによる画面遷移になる。
-  // 1画面前なのでroute.backでもrouter.popどちらでもOK
-  // 複数前の画面に戻りたいときはrouter.pop(3)のようにpopを使って戻る
+  const selectLabelId = useRecoilValue(selectedLabelIdState);                 // 選択されているlabelId
+
+  /**
+   * 作成が押下されたときの処理
+   */
   const handleCreatePress = () => {
+    // memo画面はモーダルで開かず、Stackによる画面遷移になる。
+    // 1画面前なのでroute.backでもrouter.popどちらでもOK
+    // 複数前の画面に戻りたいときはrouter.pop(3)のようにpopを使って戻る
     router.back();
   }
 

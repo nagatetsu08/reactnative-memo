@@ -5,6 +5,10 @@ import { useEffect, useState } from 'react';
 import { MemoInputForm } from '../../src/components/MemoInputForm';
 import { KeyboardAvoidingView } from '@gluestack-ui/themed';
 
+// ダミーメモデータ
+import { MEMO_DATA } from '../../src/dummy_data/memoData';
+
+
 export default function MemoEditScreen() {
   const router = useRouter();
 
@@ -34,6 +38,16 @@ export default function MemoEditScreen() {
       }
     })
   }, [])
+
+  // useEffectの中で使う変数は全て監視対象にするのがセオリー（定数は監視しなくていい）
+  useEffect(() => {
+    // 選択されたメモ情報を設定
+    const memo = MEMO_DATA.find(memo => memo.id === id)
+    if (memo) {
+      setTitle(memo.title)
+      setContent(memo.content)
+    }
+  },[id])
 
   return (
     // KeyboardAvoidingViewはスマホでキーボードを出す際に下部の方に入力した値がキーボードで隠れないように

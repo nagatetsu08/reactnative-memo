@@ -5,24 +5,12 @@ import { useEffect } from 'react';
 import { LabelListItem } from '../../src/components/LabelListItem';
 import { ListItem } from '@rneui/themed';
 
+// Recoil
+import { useRecoilState } from 'recoil';
+import { selectedLabelIdState } from '../../src/recoils/selectedLabelId';
+
 // ダミーデータ
-const LABEL_DATA = [
-  {
-    id: 1,
-    name: 'プログラミング',
-    color: 'blue'
-  },
-    {
-    id: 2,
-    name: 'パスワード',
-    color: 'green'
-  },
-    {
-    id: 3,
-    name: '料理',
-    color: 'orange'
-  },
-]
+import { LABEL_DATA } from '../../src/dummy_data/labelData';
 
 /**
  * ホーム画面
@@ -33,6 +21,9 @@ export default function HomeScreen() {
 
   const router = useRouter();
   const navigation = useNavigation(); //今回は画面遷移をコントロールするのではなく、ナビゲーションバーをいじくるために必要
+
+  // Recoil経由でのState管理
+  const [selectedLabelId, setSelectedLabelId] = useRecoilState(selectedLabelIdState)
 
   useEffect(() => {
     navigation.setOptions({
@@ -48,6 +39,7 @@ export default function HomeScreen() {
    */
 
   const handleAllMemoPress = () => {
+    setSelectedLabelId(undefined)
     router.push({pathname: "/memos"})
   }
 
@@ -59,8 +51,8 @@ export default function HomeScreen() {
  */
 
   const handleLabelPress = (labelId: number) => {
-    const params = {labelId: labelId}
-    router.push({pathname: "/memos", params: params})
+    setSelectedLabelId(labelId)       // labelIDを状態管理ツールにセットする
+    router.push({pathname: "/memos"})
   }
 
 

@@ -51,7 +51,7 @@ export default function LabelEditScreen() {
         </Input>
 
         {/* カラーピッカー */}
-        <ColorPicker onPress={() => handleColorPress(color)} />
+        <ColorPicker onPress={handleColorPress} />
 
         <VStack space="md">
           <Button size="md" action="primary" marginHorizontal={"$4"} onPress={handleEditPress}>

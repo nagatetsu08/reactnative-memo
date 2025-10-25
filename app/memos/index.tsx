@@ -8,44 +8,17 @@ import { MemoListItem } from '../../src/components/MemoListItem';
 import { LabelTag } from '../../src/components/LabelTag';
 import { LabelListModal } from '../../src/components/LabelListModal';
 
-// ダミーメモデータ
-const memoData = [
-  {
-    id: "abcd",
-    name: "useStateについて",
-    contents: "useStateの説明",
-    label: {name: "プログラミング", color: "blue"}
-  },
-  {
-    id: "efgh",
-    name: "アカウント",
-    contents: "メールアドレス： 123@example.com/nパスワード：password",
-  },
-  {
-    id: "ijkl",
-    name: "オムライスのレシピ",
-    contents: "卵: 2個/nご飯: 200g/nたまねぎ: 1/2個/nケチャップ: 少々",
-  },
-]
+// Recoil
+import { useRecoilValue } from 'recoil'; // Recoilへの値設定はやらずに、設定されている値を使うだけ
+import { selectedLabelIdState } from '../../src/recoils/selectedLabelId';
+import { type Label } from '../../src/types/label';
+import { type Memo } from '../../src/types/memo';
 
-// ダミーデータ
-const LABEL_DATA = [
-  {
-    id: 1,
-    name: 'プログラミング',
-    color: 'blue'
-  },
-    {
-    id: 2,
-    name: 'パスワード',
-    color: 'green'
-  },
-    {
-    id: 3,
-    name: '料理',
-    color: 'orange'
-  },
-]
+// ダミーメモデータ
+import { MEMO_DATA } from '../../src/dummy_data/memoData';
+
+// ダミーLabelデータ
+import { LABEL_DATA } from '../../src/dummy_data/labelData';
 
 export default function MemoListScreen() {
   const router = useRouter();
@@ -56,10 +29,14 @@ export default function MemoListScreen() {
   // import { useRoute } from '@react-navigation/native';
   // const { userId } = route.params as { userId: number };
 
-  const { labelId } = useLocalSearchParams();
   const navigation = useNavigation(); //今回は画面遷移をコントロールするのではなく、ナビゲーションバーをいじくるために必要
   const [isLabelListModalVisible, setIsLabelListModalVisible] = useState(false) //ラベルリストモーダルの表示状態を管理
 
+  const selectLabelId = useRecoilValue(selectedLabelIdState);                 // 選択されているlabelId
+  const selectedLabel = LABEL_DATA.find(label => label.id === selectLabelId)  // 選択されているlabelIdに紐づくオブジェクトを取得
+
+  const [labels, setLabels] = useState<Label[]>([]);  // ラベルリスト
+  const [memos, setMemos] = useState<Memo[]>([])      //メモリスト
 
   useEffect(() => {
     navigation.setOptions({
@@ -67,6 +44,17 @@ export default function MemoListScreen() {
         return <Feather name="edit" size={24} color="black" onPress={handleCreatePress}/>
       }
     })
+  }, [])
+
+  useEffect(() => {
+    // ラベルリストを設定する
+    const labels = LABEL_DATA
+    setLabels(labels)
+
+    // 選択されたメモ（本来こういうのはaxios等でselectLabelIdを渡しつつバックエンドから必要なデータのみを抽出する。）
+    // フロントエンドエンジニアにありがちな、データ持ってききてこっちでフィルタリングってのはパフォーマンス的にNG
+    const fileterdMemos = selectLabelId ? MEMO_DATA.filter(memo => memo.labelId === selectLabelId) : MEMO_DATA
+    setMemos(fileterdMemos)
   }, [])
 
   const handleCreatePress = () => {
@@ -122,24 +110,26 @@ export default function MemoListScreen() {
     <View style={styles.container}>
       <FlatList
         ListHeaderComponent={
-          labelId ? (
+          selectedLabel ? (
             <View style={{margin: 10}}>
-              <LabelTag color="blue" name={`ラベルID: ${labelId}`} />
+              <LabelTag color={selectedLabel.color} name={selectedLabel.name} />
             </View>
           ) : (
             <></>
           )
         }
         contentContainerStyle={styles.flatList}
-        data={memoData}
+        data={memos}
         renderItem={({item}) => (
           <MemoListItem
-            name={item.name}
-            content={item.contents}
+            name={item.title}
+            content={item.content}
             onPress={() => hadleMemoPress(item.id)}
             onLongPress={() => handleMemoLongPress(item.id)}
             onDeletePress={() => handleMemoDeletePress(item.id)}
-            label={item.label}
+            // ラベルはselectLabelIdが渡ってきたときは表示させない（画面上部にすでに出ているから）
+            // selectLabelIdが渡ってきてないときは、すべてのメモを選択されたことになるので、各メモのタイルの最下部にラベルコンテンツを表示する
+            label={selectLabelId ? undefined : LABEL_DATA.find(label => label.id === item.labelId)}
           />
         )}
         keyExtractor={item => item.id}
@@ -148,7 +138,7 @@ export default function MemoListScreen() {
       <LabelListModal
         visible={isLabelListModalVisible} // この変数はState変数として、useStateで管理している。この値が切り替わるたびに描画が再評価される感じ
         title="ラベル設定"
-        data={LABEL_DATA}
+        data={labels}
         onPress={handleLabelPress}
         onClose={handleLabelListModalClose}
       />
