@@ -13,10 +13,72 @@ const CreateTableMemos = `
   );
 `;
 
+/**
+ * 全てのメモを取得
+ */
+const SelectMemos = `
+  SELECT
+    m.id,
+    m.label_id,
+    m.title,
+    m.content,
+    m.created_at,
+    m.updated_at,
+    l.name,
+    l.color
+  FROM
+    memos m
+  LEFT JOIN
+    labels l
+  ON
+    m.label_id = l.id
+  ORDER BY
+    m.updated_at DESC;
+`;
+
+/**
+ * メモIDを指定したメモを取得
+ * @param id メモID
+ */
+const SelectMemoByTargetId = `
+  SELECT
+    id,
+    label_id,
+    title,
+    content,
+    created_at,
+    updated_at
+  FROM
+    memos
+  WHERE
+    id = ?
+`;
+
+/**
+ * メモ追加
+ * @param id      メモID
+ * @param title   タイトル
+ * @param content 内容
+ */
+const InsertMemo = `
+  INSERT INTO memos (
+    id,
+    title,
+    content
+  ) VALUES (
+    ?,
+    ?,
+    ?
+  )
+`;
+
 // freezeを使うことでオブジェクトを変更不可にしつつ、「LabelQueries.〜」の形で呼び出せるようにしている。
 // いちいちSQL増えるたびにexport constに追加していくのはナンセンスだから
 const MemoQueries = Object.freeze({
-  CREATE_TABLE: CreateTableMemos
+  CREATE_TABLE: CreateTableMemos,
+  INSERT: InsertMemo,
+  SELECT_MEMOS: SelectMemos,
+  SELECT_MEMO_TARGET_ID: SelectMemoByTargetId
 });
 
 export { MemoQueries };

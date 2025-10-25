@@ -21,8 +21,8 @@ export default function InitialScreen() {
   const initApp = async  () => {
     try {
       // テーブル作成処理
-      await LabelService.createTable
-      await MemoService.createTable
+      await LabelService.createTable();
+      await MemoService.createTable();
 
       console.log(getDbFilePath());
 

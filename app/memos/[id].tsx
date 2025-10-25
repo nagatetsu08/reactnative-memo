@@ -1,12 +1,12 @@
 // メモ修正画面
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { StyleSheet, Text, View, Button, Alert } from 'react-native';
 import { useRouter, useLocalSearchParams,useNavigation } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { MemoInputForm } from '../../src/components/MemoInputForm';
 import { KeyboardAvoidingView } from '@gluestack-ui/themed';
 
 // ダミーメモデータ
-import { MEMO_DATA } from '../../src/dummy_data/memoData';
+import * as MemoService from "../../src/services/memoService"
 
 
 export default function MemoEditScreen() {
@@ -18,7 +18,9 @@ export default function MemoEditScreen() {
   // import { useRoute } from '@react-navigation/native';
   // const { userId } = route.params as { userId: number };
 
-  const { id } = useLocalSearchParams();
+  // useLocalSearchParamsはstringかstring配列を返すので、型が厳格していされている（stringしかだめ）場合、
+  // エラーになるので、ここでstring型として型アサーションする。
+  const { id } = useLocalSearchParams() as {id: string};
 
   const [title, setTitle] = useState<string>("")      // タイトル
   const [content, setContent] = useState<string>("")  // コンテンツ
@@ -41,11 +43,41 @@ export default function MemoEditScreen() {
 
   // useEffectの中で使う変数は全て監視対象にするのがセオリー（定数は監視しなくていい）
   useEffect(() => {
-    // 選択されたメモ情報を設定
-    const memo = MEMO_DATA.find(memo => memo.id === id)
-    if (memo) {
-      setTitle(memo.title)
-      setContent(memo.content)
+
+    // この画面にきてすぐ前の画面に戻るといったように、非同期が終わる前にこの画面のフォーカスが外れる（unmountになる）と
+    // その後に実行されるsetStateが何にも使われない上にメモリリークの原因となる。
+    // 従って、非同期処理直後のチェックと最後にクリーンアップ関数でisMountedフラグをオフにしてやる処理を実装する必要がある。
+    // Udemy動画のやり方はエラーにはならないがいけてないらしいのでこっちのやり方にする。
+    let isMounted = true;
+
+    const loadData = async (memoId: string) => {
+      try {
+        // 選択されたメモ情報を取得
+        const memo = await MemoService.getMemo(memoId);
+
+        // アンマウント済みなら以降の処理をすべてスキップ
+        if (!isMounted) return;
+
+        //メモが存在しない場合はエラーを表示して戻る
+        if(!memo) {
+          Alert.alert("エラー", "メモが見つかりませんでした", [{text: "OK", onPress: () => router.back()}])
+          return;
+        }
+
+        // メモのタイトルと内容をセット
+        setTitle(memo.title)
+        setContent(memo.content)
+      }catch(error) {
+        if (!isMounted) return;
+        Alert.alert("エラー", "データの取得に失敗しました", [{text: "OK", onPress: () => router.back()}])
+        return;
+      }
+    }
+
+    loadData(id)
+
+    return () => {
+      isMounted = false;
     }
   },[id])
 

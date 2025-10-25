@@ -5,7 +5,7 @@ const CreateTableLabels = `
     name        TEXT      NOT NULL,
     color       TEXT      NOT NULL,
     created_at  TEXT      DEFAULT(DATETIME('now', 'localtime')),
-    updated_at  TEXT      DEFAULT(DATETIME('now', 'localtime')),
+    updated_at  TEXT      DEFAULT(DATETIME('now', 'localtime'))
   );
 `;
 

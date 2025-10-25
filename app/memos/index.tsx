@@ -1,8 +1,8 @@
 // メモ一覧画面
 // メモ修正画面
-import { StyleSheet, Text, View, Button, FlatList } from 'react-native';
-import { useRouter, useLocalSearchParams, useNavigation } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, Button, FlatList, Alert } from 'react-native';
+import { useRouter, useLocalSearchParams, useNavigation, useFocusEffect } from 'expo-router';
+import { useEffect, useState, useCallback} from 'react';
 import Feather from '@expo/vector-icons/Feather';
 import { MemoListItem } from '../../src/components/MemoListItem';
 import { LabelTag } from '../../src/components/LabelTag';
@@ -13,6 +13,8 @@ import { useRecoilValue } from 'recoil'; // Recoilへの値設定はやらずに
 import { selectedLabelIdState } from '../../src/recoils/selectedLabelId';
 import { type Label } from '../../src/types/label';
 import { type Memo } from '../../src/types/memo';
+
+import * as MemoService from '../../src/services/memoService';
 
 // ダミーメモデータ
 import { MEMO_DATA } from '../../src/dummy_data/memoData';
@@ -46,20 +48,59 @@ export default function MemoListScreen() {
     })
   }, [])
 
-  useEffect(() => {
-    // ラベルリストを設定する
-    const labels = LABEL_DATA
-    setLabels(labels)
+  // useEffect(() => {
+  //   // ラベルリストを設定する
+  //   const labels = LABEL_DATA
+  //   setLabels(labels)
 
-    // 選択されたメモ（本来こういうのはaxios等でselectLabelIdを渡しつつバックエンドから必要なデータのみを抽出する。）
-    // フロントエンドエンジニアにありがちな、データ持ってききてこっちでフィルタリングってのはパフォーマンス的にNG
-    const fileterdMemos = selectLabelId ? MEMO_DATA.filter(memo => memo.labelId === selectLabelId) : MEMO_DATA
-    setMemos(fileterdMemos)
-  }, [])
+  //   // 選択されたメモ（本来こういうのはaxios等でselectLabelIdを渡しつつバックエンドから必要なデータのみを抽出する。）
+  //   // フロントエンドエンジニアにありがちな、データ持ってききてこっちでフィルタリングってのはパフォーマンス的にNG
+  //   const fileterdMemos = selectLabelId ? MEMO_DATA.filter(memo => memo.labelId === selectLabelId) : MEMO_DATA
+  //   setMemos(fileterdMemos)
+  // }, [])
 
   const handleCreatePress = () => {
     router.push({pathname: "/memos/create"});
   }
+
+  // 作成画面から戻ってきた時など、この画面にFoucusが当たるたびに以下の処理が実行される。
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true; // フラグ管理
+      const loadData = async(labelId: number | undefined) => {
+        try {
+          // ラベルリストを設定する
+          const labels = LABEL_DATA
+
+          // ここはまだ非同期処理手前だからやらなくてもいいけど、処理全体がasyncになってるので統一する意味ではやっといたほうがいい
+          if (!isActive) return;
+          setLabels(labels)
+
+          // メモ一覧取得
+          const memos = await MemoService.getMemos();
+
+          // アンマウント済みなら以降の処理をすべてスキップ
+          if (!isActive) return;
+
+          const fileterdMemos = labelId ? memos.filter(memo => memo.labelId === labelId) : memos
+          setMemos(fileterdMemos)
+
+        } catch(error) {
+          console.error('メモ取得エラー:', error); // ← デバッグ用のログ
+          // エラー時も画面がアクティブな場合のみ表示
+          if (!isActive) return
+          Alert.alert("エラー", "データの取得に失敗しました", [{text: "ok", onPress: () => router.back()}])
+        }
+
+      }
+
+      loadData(selectLabelId)
+      return () => {
+        console.log('画面がアンフォーカスされました');
+        isActive = false;
+      };
+    }, [selectLabelId])
+  )
 
   /**
    * メモがタップされたときの処理
