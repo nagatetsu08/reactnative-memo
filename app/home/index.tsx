@@ -43,8 +43,7 @@ export default function HomeScreen() {
           const labels = await LabelService.getLabels()
 
           // アンマウント済みなら以降の処理をすべてスキップ
-          // アンマウントの状態でsetState関数を実行すると、使用されないだけでなく、無駄にメモリを確保してしまい、メモリリークの
-          // 原因となる
+          // アンマウントの状態でsetState関数を実行すると、使用されないだけでなく、無駄にメモリを確保してしまい、メモリリークの原因となる
           if (!isActive) return;
 
           setLabels(labels)

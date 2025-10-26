@@ -23,7 +23,7 @@ export default function Layout() {
       <Stack.Screen
         name="[id]"
         options={{
-          headerTitle: "ラベル修正r",
+          headerTitle: "ラベル修正",
           headerLeft: () => (
             // TouchableOpacityでラップしたものがタッチ操作を受け付けられるようになる
             // ボタン以外のやつに仕掛けられる（例えばtextとか）

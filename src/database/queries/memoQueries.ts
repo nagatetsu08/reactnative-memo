@@ -100,6 +100,51 @@ const DeleteMemo = `
     id = ?
 `;
 
+/**
+ * ラベル削除時に削除されたラベルに紐づくラベルのIDをNULLに更新
+ * @param label_id ラベルID
+ *
+ */
+
+const UpdateTargetLabelIdToNull = `
+  UPDATE
+    memos
+  SET
+    label_id = NULL,
+    updated_at = (DATETIME('now','localtime'))
+  WHERE
+    label_id = ?
+`;
+
+/**
+ * メモのラベル更新
+ * @param labelId ラベルID
+ * @param id メモID
+ */
+const UpdateMemoLabelIdById = `
+  UPDATE
+    memos
+  SET
+    label_id = ?,
+    updated_at = (DATETIME('now','localtime'))
+  WHERE
+    id = ?
+`;
+
+/**
+ * メモのラベルIDをNULLに更新
+ * @param id メモID
+ */
+const UpdateMemoLabelIdToNullById = `
+  UPDATE
+    memos
+  SET
+    label_id = NULL,
+    updated_at = (DATETIME('now','localtime'))
+  WHERE
+    id = ?
+`;
+
 // freezeを使うことでオブジェクトを変更不可にしつつ、「LabelQueries.〜」の形で呼び出せるようにしている。
 // いちいちSQL増えるたびにexport constに追加していくのはナンセンスだから
 const MemoQueries = Object.freeze({
@@ -108,7 +153,10 @@ const MemoQueries = Object.freeze({
   SELECT_MEMOS: SelectMemos,
   SELECT_MEMO_TARGET_ID: SelectMemoByTargetId,
   UPDATE: UpdateMemo,
-  DELETE: DeleteMemo
+  DELETE: DeleteMemo,
+  UPDATE_TARGET_LABELID_TO_NULL: UpdateTargetLabelIdToNull,
+  UPDATE_LABEL_ID_BY_ID: UpdateMemoLabelIdById,
+  UPDATE_LABEL_ID_TO_NULL_BY_ID: UpdateMemoLabelIdToNullById
 });
 
 export { MemoQueries };
