@@ -1,16 +1,15 @@
-import { StyleSheet, View, ScrollView, Text } from 'react-native';
+import { StyleSheet, View, ScrollView, Text, Alert } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons'
-import { useRouter, useNavigation } from 'expo-router';
-import { useEffect } from 'react';
+import { useRouter, useNavigation, useFocusEffect } from 'expo-router';
+import { useEffect, useState,useCallback } from 'react';
 import { LabelListItem } from '../../src/components/LabelListItem';
 import { ListItem } from '@rneui/themed';
+import * as LabelService from '../../src/services/labelServcice';
+import type { Label } from '../../src/types/label';
 
 // Recoil
 import { useRecoilState } from 'recoil';
 import { selectedLabelIdState } from '../../src/recoils/selectedLabelId';
-
-// ダミーデータ
-import { LABEL_DATA } from '../../src/dummy_data/labelData';
 
 /**
  * ホーム画面
@@ -22,6 +21,8 @@ export default function HomeScreen() {
   const router = useRouter();
   const navigation = useNavigation(); //今回は画面遷移をコントロールするのではなく、ナビゲーションバーをいじくるために必要
 
+  const [labels, setLabels] = useState<Label[]>([]); // ラベルリスト
+
   // Recoil経由でのState管理
   const [selectedLabelId, setSelectedLabelId] = useRecoilState(selectedLabelIdState)
 
@@ -32,6 +33,37 @@ export default function HomeScreen() {
       }
     })
   }, [])
+
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true; // フラグ管理
+      const LoadData = async() => {
+        try {
+          //　ラベル一覧取得
+          const labels = await LabelService.getLabels()
+
+          // アンマウント済みなら以降の処理をすべてスキップ
+          // アンマウントの状態でsetState関数を実行すると、使用されないだけでなく、無駄にメモリを確保してしまい、メモリリークの
+          // 原因となる
+          if (!isActive) return;
+
+          setLabels(labels)
+        } catch(error) {
+          // アンマウント済みなら以降の処理をすべてスキップ
+          if (!isActive) return;
+
+          Alert.alert("エラー", "データの取得に失敗しました")
+        }
+      }
+      LoadData();
+
+      // 以下はクリア関数。このように定義することで、アンマウント時に
+      // 自動で以下関数を実行してくれる。
+      return () => {
+        isActive = false;
+      };
+    }, [])
+  )
 
   /**
    * 全てのメモタップ時の処理
@@ -91,7 +123,7 @@ export default function HomeScreen() {
 
         <Text style={styles.sectionText}>ラベル</Text>
 
-        {LABEL_DATA.map(item => (
+        {labels.map(item => (
           <LabelListItem
             key={item.id}
             color={item.color}

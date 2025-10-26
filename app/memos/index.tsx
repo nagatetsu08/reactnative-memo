@@ -16,12 +16,10 @@ import { type Label } from '../../src/types/label';
 import { type Memo } from '../../src/types/memo';
 
 import * as MemoService from '../../src/services/memoService';
+import * as LabelService from '../../src/services/labelServcice';
 
 // ダミーメモデータ
 import { MEMO_DATA } from '../../src/dummy_data/memoData';
-
-// ダミーLabelデータ
-import { LABEL_DATA } from '../../src/dummy_data/labelData';
 
 export default function MemoListScreen() {
   const router = useRouter();
@@ -33,14 +31,17 @@ export default function MemoListScreen() {
   // const { userId } = route.params as { userId: number };
 
   const navigation = useNavigation(); //今回は画面遷移をコントロールするのではなく、ナビゲーションバーをいじくるために必要
+
+  // State変数
   const [isLabelListModalVisible, setIsLabelListModalVisible] = useState(false) //ラベルリストモーダルの表示状態を管理
-
-  const selectLabelId = useRecoilValue(selectedLabelIdState);                 // 選択されているlabelId
-  const selectedLabel = LABEL_DATA.find(label => label.id === selectLabelId)  // 選択されているlabelIdに紐づくオブジェクトを取得
-
   const [labels, setLabels] = useState<Label[]>([]);  // ラベルリスト
   const [memos, setMemos] = useState<Memo[]>([])      //メモリスト
   const [isLoading, setIsLoading] = useState<boolean>(false)  // インジケータの表示状態
+
+
+  const selectLabelId = useRecoilValue(selectedLabelIdState);                 // 選択されているlabelId
+  const selectedLabel = labels.find(label => label.id === selectLabelId)  // 選択されているlabelIdに紐づくオブジェクトを取得
+
 
   useEffect(() => {
     navigation.setOptions({
@@ -49,11 +50,6 @@ export default function MemoListScreen() {
       }
     })
   }, [])
-
-  // useEffect(() => {
-  //   // ラベルリストを設定する
-  //   const labels = LABEL_DATA
-  //   setLabels(labels)
 
   //   // 選択されたメモ（本来こういうのはaxios等でselectLabelIdを渡しつつバックエンドから必要なデータのみを抽出する。）
   //   // フロントエンドエンジニアにありがちな、データ持ってききてこっちでフィルタリングってのはパフォーマンス的にNG
@@ -72,9 +68,8 @@ export default function MemoListScreen() {
       const loadData = async(labelId: number | undefined) => {
         try {
           // ラベルリストを設定する
-          const labels = LABEL_DATA
+          const labels = await LabelService.getLabels()
 
-          // ここはまだ非同期処理手前だからやらなくてもいいけど、処理全体がasyncになってるので統一する意味ではやっといたほうがいい
           if (!isActive) return;
           setLabels(labels)
 
@@ -186,7 +181,7 @@ export default function MemoListScreen() {
             onDeletePress={() => handleMemoDeletePress(item.id)}
             // ラベルはselectLabelIdが渡ってきたときは表示させない（画面上部にすでに出ているから）
             // selectLabelIdが渡ってきてないときは、すべてのメモを選択されたことになるので、各メモのタイルの最下部にラベルコンテンツを表示する
-            label={selectLabelId ? undefined : LABEL_DATA.find(label => label.id === item.labelId)}
+            label={selectLabelId ? undefined : labels.find(label => label.id === item.labelId)}
           />
         )}
         keyExtractor={item => item.id}

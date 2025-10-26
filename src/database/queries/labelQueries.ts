@@ -44,6 +44,7 @@ const InsertLabel = `
 // いちいちSQL増えるたびにexport constに追加していくのはナンセンスだから
 const LabelQueries = Object.freeze({
   CREATE_TABLE: CreateTableLabels,
+  SELECT_LABELS: SelectLabels,
   INSERT: InsertLabel
 });
 
