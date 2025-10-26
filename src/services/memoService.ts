@@ -58,12 +58,18 @@ const getMemo = async (memoId: string): Promise<Memo | undefined> => {
 /**
  * メモ追加
  *
+ * @param labelId   // メモに設定するラベルID
  * @param title     // タイトル
  * @param content   // 内容
  */
-const addMemo = async (title: string, content: string) => {
+const addMemo = async (labelId: number | undefined, title: string, content: string) => {
   const memoId = Crypto.randomUUID();
-  await execute({ sql: MemoQueries.INSERT, params: [memoId, title, content] });
+
+  let insertLabelId: number | null = null;
+  if (labelId) {
+    insertLabelId = labelId;
+  }
+  await execute({ sql: MemoQueries.INSERT, params: [memoId, title, content, insertLabelId] });
 };
 
 /**

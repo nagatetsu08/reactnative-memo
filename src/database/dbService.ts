@@ -7,7 +7,7 @@ import * as SQLite from 'expo-sqlite';
  */
 type SqlArg = {
   sql: string;
-  params?: (string | number)[];
+  params?: (string | number | null)[];
 };
 
 const DB_NAME = 'MemoAPP.db'; // DB名

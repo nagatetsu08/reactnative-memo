@@ -37,7 +37,7 @@ export default function MemoCreateScreen() {
 
     try {
       // メモを追加する
-      await MemoService.addMemo(title, content)
+      await MemoService.addMemo(selectLabelId ?? undefined, title, content)
 
       // memo画面はモーダルで開かず、Stackによる画面遷移になる。
       // 1画面前なのでroute.backでもrouter.popどちらでもOK

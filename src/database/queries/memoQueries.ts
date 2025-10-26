@@ -56,16 +56,19 @@ const SelectMemoByTargetId = `
 
 /**
  * メモ追加
- * @param id      メモID
- * @param title   タイトル
- * @param content 内容
+ * @param id        メモID
+ * @param title     タイトル
+ * @param content   内容
+ * @param label_id  メモID
  */
 const InsertMemo = `
   INSERT INTO memos (
     id,
     title,
-    content
+    content,
+    label_id
   ) VALUES (
+    ?,
     ?,
     ?,
     ?
