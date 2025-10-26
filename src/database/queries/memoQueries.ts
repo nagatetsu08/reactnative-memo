@@ -72,13 +72,43 @@ const InsertMemo = `
   )
 `;
 
+/**
+ * メモ更新
+ * @param title   タイトル
+ * @param content 内容
+ * @param id      メモID
+ */
+const UpdateMemo = `
+  UPDATE
+    memos
+  SET
+    title = ?,
+    content = ?,
+    updated_at = (DATETIME('now','localtime'))
+  WHERE
+    id = ?
+`;
+
+/**
+ * メモ削除
+ * @param id メモID
+ */
+const DeleteMemo = `
+  DELETE FROM
+    memos
+  WHERE
+    id = ?
+`;
+
 // freezeを使うことでオブジェクトを変更不可にしつつ、「LabelQueries.〜」の形で呼び出せるようにしている。
 // いちいちSQL増えるたびにexport constに追加していくのはナンセンスだから
 const MemoQueries = Object.freeze({
   CREATE_TABLE: CreateTableMemos,
   INSERT: InsertMemo,
   SELECT_MEMOS: SelectMemos,
-  SELECT_MEMO_TARGET_ID: SelectMemoByTargetId
+  SELECT_MEMO_TARGET_ID: SelectMemoByTargetId,
+  UPDATE: UpdateMemo,
+  DELETE: DeleteMemo
 });
 
 export { MemoQueries };

@@ -4,6 +4,7 @@ import { useRouter, useLocalSearchParams,useNavigation } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { MemoInputForm } from '../../src/components/MemoInputForm';
 import { KeyboardAvoidingView } from '@gluestack-ui/themed';
+import { Indicator } from '../../src/components/Indicator';
 
 // ダミーメモデータ
 import * as MemoService from "../../src/services/memoService"
@@ -24,10 +25,32 @@ export default function MemoEditScreen() {
 
   const [title, setTitle] = useState<string>("")      // タイトル
   const [content, setContent] = useState<string>("")  // コンテンツ
+  const [isLoading, setIsLoading] = useState<boolean>(false)  // インジケータの表示状態
 
   // 作成ボタンを押下したらデータを保存して、画面自体は閉じる。
   // この画面はModalで開くので、dismiss()で閉じることが可能
-  const handleSavePress = () => {
+  const handleSavePress = async() => {
+    // バリデーション
+    if (!title) {
+      Alert.alert("確認", "タイトルを設定してください")
+      return
+    }
+
+    setIsLoading(true);
+
+    try {
+      // メモを追加する
+      await MemoService.editMemo(id, title, content)
+
+      // memo画面はモーダルで開かず、Stackによる画面遷移になる。
+      // 1画面前なのでroute.backでもrouter.popどちらでもOK
+      // 複数前の画面に戻りたいときはrouter.pop(3)のようにpopを使って戻る
+      router.back();
+    } catch(error) {
+      Alert.alert("エラー", "メモの保存に失敗しました")
+    } finally {
+      setIsLoading(false);
+    }
     router.back();
   }
 
@@ -39,7 +62,7 @@ export default function MemoEditScreen() {
         return <Button title="保存" onPress={handleSavePress} />
       }
     })
-  }, [])
+  }, [title, content])
 
   // useEffectの中で使う変数は全て監視対象にするのがセオリー（定数は監視しなくていい）
   useEffect(() => {
@@ -95,6 +118,7 @@ export default function MemoEditScreen() {
         onContentChange={setContent}
         onTitleChange={setTitle}
       />
+      <Indicator visible={isLoading} />
     </KeyboardAvoidingView>
   );
 }

@@ -7,6 +7,7 @@ import Feather from '@expo/vector-icons/Feather';
 import { MemoListItem } from '../../src/components/MemoListItem';
 import { LabelTag } from '../../src/components/LabelTag';
 import { LabelListModal } from '../../src/components/LabelListModal';
+import { Indicator } from '../../src/components/Indicator';
 
 // Recoil
 import { useRecoilValue } from 'recoil'; // Recoilへの値設定はやらずに、設定されている値を使うだけ
@@ -39,6 +40,7 @@ export default function MemoListScreen() {
 
   const [labels, setLabels] = useState<Label[]>([]);  // ラベルリスト
   const [memos, setMemos] = useState<Memo[]>([])      //メモリスト
+  const [isLoading, setIsLoading] = useState<boolean>(false)  // インジケータの表示状態
 
   useEffect(() => {
     navigation.setOptions({
@@ -124,7 +126,21 @@ export default function MemoListScreen() {
    * @param memoId // メモID
    *
    */
-  const handleMemoDeletePress = (memoId: string) => {
+  const handleMemoDeletePress = async (memoId: string) => {
+
+    setIsLoading(true);
+
+    try {
+      await MemoService.deleteMemo(memoId)
+
+      // DBから削除後にStateから消してやる
+      setMemos(memos.filter(memo => memo.id !== memoId));
+    } catch(error) {
+      Alert.alert("エラー", "メモの削除に失敗しました", [{text: "ok", onPress: () => router.back()}])
+    } finally {
+      setIsLoading(false);
+    }
+
     console.log("メモが削除されました")
   }
 
@@ -183,7 +199,7 @@ export default function MemoListScreen() {
         onPress={handleLabelPress}
         onClose={handleLabelListModalClose}
       />
-
+      <Indicator visible={isLoading} />
     </View>
   );
 }

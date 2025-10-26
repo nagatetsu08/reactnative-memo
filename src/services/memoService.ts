@@ -66,4 +66,22 @@ const addMemo = async (title: string, content: string) => {
   await execute({ sql: MemoQueries.INSERT, params: [memoId, title, content] });
 };
 
-export { createTable, addMemo, getMemos, getMemo };
+/**
+ * メモ修正
+ * @param memoId
+ * @param title
+ * @param content
+ */
+const editMemo = async (memoId: string, title: string, content: string) => {
+  await execute({ sql: MemoQueries.UPDATE, params: [title, content, memoId] });
+};
+
+/**
+ * メモ削除
+ * @param memoId
+ */
+const deleteMemo = async (memoId: string) => {
+  await execute({ sql: MemoQueries.DELETE, params: [memoId] });
+};
+
+export { createTable, addMemo, getMemos, getMemo, editMemo, deleteMemo };

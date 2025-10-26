@@ -9,10 +9,42 @@ const CreateTableLabels = `
   );
 `;
 
+/**
+ * 全てのラベルを取得
+ */
+const SelectLabels = `
+  SELECT
+    id,
+    name,
+    color,
+    created_at,
+    updated_at
+  FROM
+    labels
+  ORDER BY
+    created_at ASC
+`;
+
+/**
+ * ラベル追加
+ * @param name ラベル名
+ * @param color カラーコード
+ */
+const InsertLabel = `
+  INSERT INTO labels (
+    name,
+    color
+  ) VALUES (
+    ?,
+    ?
+  );
+`;
+
 // freezeを使うことでオブジェクトを変更不可にしつつ、「LabelQueries.〜」の形で呼び出せるようにしている。
 // いちいちSQL増えるたびにexport constに追加していくのはナンセンスだから
 const LabelQueries = Object.freeze({
-  CREATE_TABLE: CreateTableLabels
+  CREATE_TABLE: CreateTableLabels,
+  INSERT: InsertLabel
 });
 
 export { LabelQueries };
