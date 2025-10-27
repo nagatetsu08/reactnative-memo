@@ -5,12 +5,15 @@ import { useEffect,useState } from 'react';
 import { MemoInputForm } from '../../src/components/MemoInputForm';
 import { KeyboardAvoidingView } from '@gluestack-ui/themed';
 import { Indicator } from '../../src/components/Indicator';
+import * as MemoService from '../../src/services/memoService'
 
 // Recoil
-import { useRecoilValue } from 'recoil'; // Recoilへの値設定はやらずに、設定されている値を使うだけ
-import { selectedLabelIdState } from '../../src/recoils/selectedLabelId';
+// import { useRecoilValue } from 'recoil'; // Recoilへの値設定はやらずに、設定されている値を使うだけ
+// import { selectedLabelIdState } from '../../src/recoils/selectedLabelId';
 
-import * as MemoService from '../../src/services/memoService'
+// jotai
+import { useAtomValue } from 'jotai';   // atomへの設定は実施せず、設定されている値を使うだけのときは、useAtomではなく、useAtomValue
+import { selectedLabelIdState } from '../../src/jotai/selectedLabelId';
 
 export default function MemoCreateScreen() {
   const router = useRouter();
@@ -19,7 +22,7 @@ export default function MemoCreateScreen() {
   const [content, setContent] = useState<string>("")          // コンテンツ
   const [isLoading, setIsLoading] = useState<boolean>(false)  // インジケータの表示状態
 
-  const selectLabelId = useRecoilValue(selectedLabelIdState);                 // 選択されているlabelId
+  const selectLabelId = useAtomValue(selectedLabelIdState);                 // 選択されているlabelId
 
   /**
    * 作成が押下されたときの処理

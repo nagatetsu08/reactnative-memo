@@ -8,18 +8,19 @@ import { MemoListItem } from '../../src/components/MemoListItem';
 import { LabelTag } from '../../src/components/LabelTag';
 import { LabelListModal } from '../../src/components/LabelListModal';
 import { Indicator } from '../../src/components/Indicator';
-
-// Recoil
-import { useRecoilValue } from 'recoil'; // Recoilへの値設定はやらずに、設定されている値を使うだけ
-import { selectedLabelIdState } from '../../src/recoils/selectedLabelId';
 import { type Label } from '../../src/types/label';
 import { type Memo } from '../../src/types/memo';
-
 import * as MemoService from '../../src/services/memoService';
 import * as LabelService from '../../src/services/labelServcice';
 
-// ダミーメモデータ
-import { MEMO_DATA } from '../../src/dummy_data/memoData';
+// Recoil
+// import { useRecoilValue } from 'recoil'; // Recoilへの値設定はやらずに、設定されている値を使うだけ
+// import { selectedLabelIdState } from '../../src/recoils/selectedLabelId';
+
+// jotai
+import { useAtomValue } from 'jotai';   // atomへの設定は実施せず、設定されている値を使うだけのときは、useAtomではなく、useAtomValue
+import { selectedLabelIdState } from '../../src/jotai/selectedLabelId';
+
 
 export default function MemoListScreen() {
   const router = useRouter();
@@ -39,7 +40,7 @@ export default function MemoListScreen() {
   const [isLoading, setIsLoading] = useState<boolean>(false)  // インジケータの表示状態
   const [selectedMemoId, setSelectedMemoId] = useState<string | undefined>(undefined); // メモが長押しされたときのメモID保持の箱
 
-  const selectLabelId = useRecoilValue(selectedLabelIdState);                 // 選択されているlabelId
+  const selectLabelId = useAtomValue(selectedLabelIdState);                 // 選択されているlabelId
   const selectedLabel = labels.find(label => label.id === selectLabelId)  // 選択されているlabelIdに紐づくオブジェクトを取得
 
 

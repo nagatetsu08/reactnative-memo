@@ -8,8 +8,13 @@ import * as LabelService from '../../src/services/labelServcice';
 import type { Label } from '../../src/types/label';
 
 // Recoil
-import { useRecoilState } from 'recoil';
-import { selectedLabelIdState } from '../../src/recoils/selectedLabelId';
+// import { useRecoilState } from 'recoil';
+// import { selectedLabelIdState } from '../../src/recoils/selectedLabelId';
+
+// jotai
+import { useAtom } from 'jotai';
+import { selectedLabelIdState } from '../../src/jotai/selectedLabelId';
+
 
 /**
  * ホーム画面
@@ -24,7 +29,7 @@ export default function HomeScreen() {
   const [labels, setLabels] = useState<Label[]>([]); // ラベルリスト
 
   // Recoil経由でのState管理
-  const [selectedLabelId, setSelectedLabelId] = useRecoilState(selectedLabelIdState)
+  const [selectedLabelId, setSelectedLabelId] = useAtom(selectedLabelIdState)
 
   useEffect(() => {
     navigation.setOptions({

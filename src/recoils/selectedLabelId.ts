@@ -1,13 +1,13 @@
-import { atom } from 'recoil';
+// import { atom } from 'recoil';
 
-/**
- * 選択されたラベルのIDを保持するRecoil
- */
+// /**
+//  * 選択されたラベルのIDを保持するRecoil
+//  */
 
-// atomというのはreduxでいうstoreみたいなもの
-const selectedLabelIdState = atom<number | undefined>({
-  key: 'selectedLabelIdState',
-  default: undefined
-});
+// // atomというのはreduxでいうstoreみたいなもの
+// const selectedLabelIdState = atom<number | undefined>({
+//   key: 'selectedLabelIdState',
+//   default: undefined
+// });
 
-export { selectedLabelIdState };
+// export { selectedLabelIdState };
